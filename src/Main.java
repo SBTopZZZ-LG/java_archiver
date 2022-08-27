@@ -3,6 +3,7 @@ import Utilities.Binaries.BinaryString;
 import Utilities.ByteArrayConversion;
 import Utilities.IO;
 import Utilities.SerializableFile;
+import com.bethecoder.ascii_table.ASCIITable;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-
-import com.bethecoder.ascii_table.ASCIITable;
 
 public class Main {
     final static Scanner sc = new Scanner(System.in);
@@ -81,6 +80,12 @@ public class Main {
                 String relativePath = file.replace(finalFolderPath, "");
 
                 try {
+                    System.out.print("Add file: " + relativePath + " (" + Binary.getFormattedSize(Files.size(Path.of(file))) + ") ");
+                } catch (IOException ignored) {
+                    System.out.print("Add file: " + relativePath + " (N/A) ");
+                }
+
+                try {
                     SerializableFile serializableFile = new SerializableFile(file, relativePath);
 
                     // Size
@@ -106,7 +111,7 @@ public class Main {
                     throw new RuntimeException(e);
                 }
 
-                System.out.println("Added file: " + relativePath);
+                System.out.println("OK");
             }
 
             @Override
