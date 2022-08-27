@@ -55,7 +55,16 @@ public abstract class Binary extends SerializableObject {
         if (size < 1073741824)
             return (size / 1048576) + " MB";
         if (size < Long.parseLong("1099511627776"))
-            return (size / 1073741824) + " GB";
-        return (size / Long.parseLong("1099511627776")) + " TB";
+            try {
+                return ((float)size / 1073741824) + " GB";
+            } catch (Exception ignored) {
+                return (size / 1073741824) + " GB";
+            }
+
+        try {
+            return ((float)size / Long.parseLong("1099511627776")) + " TB";
+        } catch (Exception ignored) {
+            return (size / Long.parseLong("1099511627776")) + " TB";
+        }
     }
 }
