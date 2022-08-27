@@ -164,7 +164,7 @@ public class Main {
         System.out.println("Extracting archive...");
 
         while (bis.available() > 0) {
-            int segmentSize = (int) Binary.byteArrayToSize(ByteArrayConversion.toByteArray(bis.readNBytes(8)));
+            int segmentSize = (int) Binary.byteArrayToSize(bis.readNBytes(8));
 
             SerializableFile embeddedFile = new SerializableFile() {{
                 fromByteArray(ByteArrayConversion.toByteArray(bis.readNBytes(segmentSize)));
@@ -210,7 +210,7 @@ public class Main {
         List<String[]> dataSet = new ArrayList<>();
 
         while (bis.available() > 0) {
-            int segmentSize = (int) Binary.byteArrayToSize(ByteArrayConversion.toByteArray(bis.readNBytes(8)));
+            int segmentSize = (int) Binary.byteArrayToSize(bis.readNBytes(8));
 
             SerializableFile embeddedFile = new SerializableFile() {{
                 fromByteArray(ByteArrayConversion.toByteArray(bis.readNBytes(segmentSize)));

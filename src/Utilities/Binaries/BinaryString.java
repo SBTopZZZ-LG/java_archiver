@@ -25,7 +25,7 @@ public class BinaryString extends Binary {
     }
 
     public void fromByteArray(Byte[] bytes, boolean hasSizeBytes) {
-        data = new String(ByteArrayConversion.toPByteArray(Arrays.copyOfRange(bytes, hasSizeBytes ? 8 : 0, hasSizeBytes ? (int) (byteArrayToSize(bytes) + 8) : bytes.length)), StandardCharsets.UTF_8);
+        data = new String(ByteArrayConversion.toPByteArray(Arrays.copyOfRange(bytes, hasSizeBytes ? 8 : 0, hasSizeBytes ? (int) (byteArrayToSize(ByteArrayConversion.toPByteArray(bytes)) + 8) : bytes.length)), StandardCharsets.UTF_8);
     }
     @Override
     public void fromByteArray(Byte[] bytes) {

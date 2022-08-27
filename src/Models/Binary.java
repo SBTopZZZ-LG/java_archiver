@@ -32,8 +32,8 @@ public abstract class Binary extends SerializableObject {
      * @param byteArray Byte array to convert
      * @return Size after conversion
      */
-    public static long byteArrayToSize(Byte[] byteArray) {
-        return staticBuffer.position(0).put(ByteArrayConversion.toPByteArray(byteArray), 0, 8).flip().getLong();
+    public static long byteArrayToSize(byte[] byteArray) {
+        return staticBuffer.position(0).put(byteArray, 0, 8).flip().getLong();
     }
 
     /**
