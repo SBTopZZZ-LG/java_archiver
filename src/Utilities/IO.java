@@ -1,49 +1,50 @@
 package Utilities;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public class IO {
-    public static Pair<String, Integer>[] getFilesAndDirs(String path) {
-        List<Pair<String, Integer>> files = new ArrayList<>();
-        File dir = new File(path);
-
-        for (final File dirFile : Objects.requireNonNull(dir.listFiles()))
-            if (dirFile.isDirectory()) {
-                files.add(new Pair<>(dirFile.getPath(), 1));
-                files.addAll(Arrays.stream(getFilesAndDirs(dirFile.getPath())).toList());
-            } else {
-                files.add(new Pair<>(dirFile.getPath(), 0));
-            }
-
-        Pair<String, Integer>[] list = new Pair[files.size()];
-        list = files.toArray(list);
-
-        return list;
-    }
+    public static final String[] EXCLUSIONS = new String[] {
+            ".url",
+            ".URL",
+    };
 
     public interface OnRetrieve {
         void onFileRetrieve(String file);
         void onFolderRetrieve(String folder);
-
-        void onProgress(int progress);
+        void onSymLinkFileRetrieve(String symLinkPath);
+        void onExclusion(String file);
     }
-    public static int getFilesAndDirs(String path, OnRetrieve onRetrieve) {
+    public static void getFilesAndDirs(String path, OnRetrieve onRetrieve) {
         File dir = new File(path);
 
-        int count = 0;
         for (final File dirFile : Objects.requireNonNull(dir.listFiles()))
             if (dirFile.isDirectory()) {
                 onRetrieve.onFolderRetrieve(dirFile.getPath());
-                count += getFilesAndDirs(dirFile.getPath(), onRetrieve);
+                getFilesAndDirs(dirFile.getPath(), onRetrieve);
             } else {
-                onRetrieve.onFileRetrieve(dirFile.getPath());
-                onRetrieve.onProgress(++count);
+                String extension = "";
+                {
+                    String[] split = dirFile.getName().split("\\.");
+                    if (split.length > 1)
+                        extension = "." + split[1];
+                }
+                final String finalExtension = extension;
+                if (!extension.equals("") && Arrays.stream(EXCLUSIONS).noneMatch(new Predicate<String>() {
+                    @Override
+                    public boolean test(String s) {
+                        return finalExtension.equals(s);
+                    }
+                })) {
+                    if (Files.isSymbolicLink(dirFile.toPath()))
+                        onRetrieve.onSymLinkFileRetrieve(dirFile.getPath());
+                    else
+                        onRetrieve.onFileRetrieve(dirFile.getPath());
+                } else
+                    onRetrieve.onExclusion(dirFile.getPath());
             }
-
-        return count;
     }
 }

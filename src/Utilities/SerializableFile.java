@@ -107,8 +107,6 @@ public class SerializableFile extends SerializableObject {
         byte[] segmentSizeBytes = new byte[8];
         try {
             // Name
-//            System.out.println("Reading name... ");
-
             segmentSize = 8;
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
@@ -118,13 +116,9 @@ public class SerializableFile extends SerializableObject {
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()));
-
-//            System.out.println(name.data);
             // Name
 
             // Path
-//            System.out.print("Reading path... ");
-
             segmentSize = 8;
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
@@ -134,13 +128,9 @@ public class SerializableFile extends SerializableObject {
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()));
-
-//            System.out.println(path.data);
             // Path
 
             // Can read
-//            System.out.print("Reading Can read... ");
-
             segmentSize = 8;
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
@@ -150,13 +140,9 @@ public class SerializableFile extends SerializableObject {
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()));
-
-//            System.out.println(canRead.data);
             // Can read
 
             // Can execute
-//            System.out.print("Reading Can execute... ");
-
             segmentSize = 8;
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
@@ -167,12 +153,9 @@ public class SerializableFile extends SerializableObject {
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()));
 
-//            System.out.println(canExecute.data);
             // Can execute
 
             // Can write
-//            System.out.print("Reading Can write... ");
-
             segmentSize = 8;
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
@@ -182,31 +165,22 @@ public class SerializableFile extends SerializableObject {
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()));
-
-//            System.out.println(canWrite.data);
             // Can write
 
             // Last modified
-//            System.out.print("Reading Last modified... ");
-
             segmentSize = 8;
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-//            System.out.println("Available bytes is " + bis.available());
             lastModified.fromByteArray(ByteArrayConversion.toByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()
             ));
-
-//            System.out.println(lastModified.data);
             // Last modified
 
             // Size
-//            System.out.print("Reading size... ");
-
             segmentSize = 8;
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
@@ -217,8 +191,6 @@ public class SerializableFile extends SerializableObject {
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()
             ));
-
-//            System.out.println(size.data);
             // Size
         } catch (IOException e) {
             e.printStackTrace();

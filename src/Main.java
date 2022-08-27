@@ -113,7 +113,12 @@ public class Main {
             public void onFolderRetrieve(String folder) {}
 
             @Override
-            public void onProgress(int progress) {}
+            public void onSymLinkFileRetrieve(String symLinkPath) {
+                System.out.println("Excluding SymLink file: " + new File(symLinkPath).getName());
+            }
+
+            @Override
+            public void onExclusion(String file) {}
         });
 
         try {
