@@ -28,6 +28,8 @@ public class IO {
                 getFilesAndDirs(dirFile.getPath(), onRetrieve);
             } else {
                 String extension = FilenameUtils.getExtension(dirFile.getName());
+                if (!extension.equals("") && !extension.startsWith("."))
+                    extension = "." + extension;
                 if (!extension.equals("") && Arrays.stream(EXCLUSIONS).noneMatch(extension::equals)) {
                     if (Files.isSymbolicLink(dirFile.toPath()))
                         onRetrieve.onSymLinkFileRetrieve(dirFile.getPath());
