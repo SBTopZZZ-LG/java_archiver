@@ -4,7 +4,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Predicate;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class IO {
     public static final String[] EXCLUSIONS = new String[] {
@@ -26,19 +27,8 @@ public class IO {
                 onRetrieve.onFolderRetrieve(dirFile.getPath());
                 getFilesAndDirs(dirFile.getPath(), onRetrieve);
             } else {
-                String extension = "";
-                {
-                    String[] split = dirFile.getName().split("\\.");
-                    if (split.length > 1)
-                        extension = "." + split[1];
-                }
-                final String finalExtension = extension;
-                if (!extension.equals("") && Arrays.stream(EXCLUSIONS).noneMatch(new Predicate<String>() {
-                    @Override
-                    public boolean test(String s) {
-                        return finalExtension.equals(s);
-                    }
-                })) {
+                String extension = FilenameUtils.getExtension(dirFile.getName());
+                if (!extension.equals("") && Arrays.stream(EXCLUSIONS).noneMatch(extension::equals)) {
                     if (Files.isSymbolicLink(dirFile.toPath()))
                         onRetrieve.onSymLinkFileRetrieve(dirFile.getPath());
                     else
