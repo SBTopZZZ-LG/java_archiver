@@ -171,12 +171,14 @@ public class Main {
             }};
             embeddedFile.path.data = extractPath + embeddedFile.path.data;
 
-            if (!embeddedFile.createFile(ByteArrayConversion.toByteArray(bis.readNBytes((int) embeddedFile.size.data)))) {
+            System.out.print("Extract file: " + embeddedFile.path.data.replace(extractPath, "") + " (" + Binary.getFormattedSize(embeddedFile.size.data) + ") ");
+
+            if (!embeddedFile.createFile(bis.readNBytes((int) embeddedFile.size.data))) {
                 System.out.println("Failed to write to file \"" + embeddedFile.name.data + "\"");
                 return;
             }
 
-            System.out.println("Extracted file: " + embeddedFile.path.data.replace(extractPath, "") + " (" + Binary.getFormattedSize(embeddedFile.size.data) + ")");
+            System.out.println("OK");
         }
 
         bis.close();
