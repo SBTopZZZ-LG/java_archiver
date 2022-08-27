@@ -43,7 +43,7 @@ public class SerializableFile extends SerializableObject {
         size = new BinaryLong(file.length());
     }
 
-    public boolean createFile(Byte[] binaryData) throws IOException {
+    public boolean createFile(byte[] binaryData) throws IOException {
         {
             // Create path if it does not exist
             File temp = new File(path.data);
@@ -66,7 +66,7 @@ public class SerializableFile extends SerializableObject {
         file.setLastModified(lastModified.data);
 
         FileOutputStream fos = new FileOutputStream(file);
-        fos.write(ByteArrayConversion.toPByteArray(binaryData));
+        fos.write(binaryData);
 
         fos.flush();
         fos.close();
