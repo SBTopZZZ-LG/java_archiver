@@ -88,6 +88,19 @@ public class SerializableFile extends SerializableObject {
                 + 8 * 7; // Additional bytes that represent lengths for each metadata
     }
 
+    /**
+     * Serializes the object into a ByteArray
+     * <li>Name length (8 bytes) + Name</li>
+     * <li>Path length (8 bytes) + Path</li>
+     * <li>Can read length (8 bytes) + Can read (1 byte)</li>
+     * <li>Can execute length (8 bytes) + Can execute (1 byte)</li>
+     * <li>Can write length (8 bytes) + Can write (1 byte)</li>
+     * <li>Last modified length (8 bytes) + Last modified (8 bytes)</li>
+     * <li>File binary size length (8 bytes) + File binary size (8 bytes)</li>
+     * Metadata size >= 75 bytes (8 * 7 + 1 * 3 + 8 * 2)
+     *
+     * @return Serialized object
+     */
     @Override
     public byte[] toByteArray() {
         return ByteArrayBuilder.build()
@@ -100,6 +113,7 @@ public class SerializableFile extends SerializableObject {
                 .appendBytes(size.sizeToByteArray(), size.toByteArray())                    // Size
                 .toByteArray();
     }
+
     public void fromByteArray(BufferedInputStream byteStream) {
         BufferedInputStream bis = new BufferedInputStream(byteStream);
 
