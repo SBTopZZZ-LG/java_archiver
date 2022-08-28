@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact name="Archivit:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Archivit_jar</output-path>
+    <root id="root">
+      <element id="archive" name="Archivit.jar">
+        <element id="module-output" name="Archivit" />
+      </element>
+      <element id="library" level="project" name="commons-io-2.11.0" />
+      <element id="library" level="project" name="btc-ascii-table-1.0" />
+    </root>
+  </artifact>
+</component>
