@@ -17,5 +17,5 @@ public abstract class SerializableObject {
      * Deserializes byte array and updates the object data
      * @param bytes Byte array to deserialize
      */
-    public abstract void fromByteArray(final Byte[] bytes);
+    public abstract void fromByteArray(final byte[] bytes);
 }

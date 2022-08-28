@@ -125,11 +125,11 @@ public class SerializableFile extends SerializableObject {
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-            name.fromByteArray(ByteArrayConversion.toByteArray(
+            name.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
-                            .toByteArray()));
+                            .toByteArray());
             // Name
 
             // Path
@@ -137,11 +137,11 @@ public class SerializableFile extends SerializableObject {
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-            path.fromByteArray(ByteArrayConversion.toByteArray(
+            path.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
-                            .toByteArray()));
+                            .toByteArray());
             // Path
 
             // Can read
@@ -149,11 +149,11 @@ public class SerializableFile extends SerializableObject {
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-            canRead.fromByteArray(ByteArrayConversion.toByteArray(
+            canRead.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
-                            .toByteArray()));
+                            .toByteArray());
             // Can read
 
             // Can execute
@@ -161,11 +161,11 @@ public class SerializableFile extends SerializableObject {
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-            canExecute.fromByteArray(ByteArrayConversion.toByteArray(
+            canExecute.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
-                            .toByteArray()));
+                            .toByteArray());
 
             // Can execute
 
@@ -174,11 +174,11 @@ public class SerializableFile extends SerializableObject {
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-            canWrite.fromByteArray(ByteArrayConversion.toByteArray(
+            canWrite.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
-                            .toByteArray()));
+                            .toByteArray());
             // Can write
 
             // Last modified
@@ -186,12 +186,12 @@ public class SerializableFile extends SerializableObject {
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-            lastModified.fromByteArray(ByteArrayConversion.toByteArray(
+            lastModified.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()
-            ));
+            );
             // Last modified
 
             // Size
@@ -199,12 +199,12 @@ public class SerializableFile extends SerializableObject {
             bis.readNBytes(segmentSizeBytes, 0, segmentSize);
             segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
 
-            size.fromByteArray(ByteArrayConversion.toByteArray(
+            size.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize - 8))
                             .toByteArray()
-            ));
+            );
             // Size
         } catch (IOException e) {
             e.printStackTrace();
@@ -212,7 +212,7 @@ public class SerializableFile extends SerializableObject {
     }
 
     @Override
-    public void fromByteArray(Byte[] bytes) {
-        fromByteArray(new BufferedInputStream(new ByteArrayInputStream(ByteArrayConversion.toPByteArray(bytes))));
+    public void fromByteArray(byte[] bytes) {
+        fromByteArray(new BufferedInputStream(new ByteArrayInputStream(bytes)));
     }
 }

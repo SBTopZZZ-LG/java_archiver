@@ -164,7 +164,7 @@ public class Main {
 
         // Check signature
         BinaryString signature = new BinaryString() {{
-            fromByteArray(ByteArrayConversion.toByteArray(bis.readNBytes(SIGNATURE.getSize())), false);
+            fromByteArray(bis.readNBytes(SIGNATURE.getSize()), false);
         }};
         if (!signature.data.equals(SIGNATURE.data)) {
             System.out.println("Specified archive file is not a valid Archivit archive!");
@@ -177,7 +177,7 @@ public class Main {
             int segmentSize = (int) Binary.byteArrayToSize(bis.readNBytes(8));
 
             SerializableFile embeddedFile = new SerializableFile() {{
-                fromByteArray(ByteArrayConversion.toByteArray(bis.readNBytes(segmentSize)));
+                fromByteArray(bis.readNBytes(segmentSize));
             }};
             embeddedFile.path.data = extractPath + embeddedFile.path.data;
 
@@ -210,7 +210,7 @@ public class Main {
 
         // Check signature
         BinaryString signature = new BinaryString() {{
-            fromByteArray(ByteArrayConversion.toByteArray(bis.readNBytes(SIGNATURE.getSize())), false);
+            fromByteArray(bis.readNBytes(SIGNATURE.getSize()), false);
         }};
         if (!signature.data.equals(SIGNATURE.data)) {
             System.out.println("Specified archive file is not a valid Archivit archive!");
@@ -223,7 +223,7 @@ public class Main {
             int segmentSize = (int) Binary.byteArrayToSize(bis.readNBytes(8));
 
             SerializableFile embeddedFile = new SerializableFile() {{
-                fromByteArray(ByteArrayConversion.toByteArray(bis.readNBytes(segmentSize)));
+                fromByteArray(bis.readNBytes(segmentSize));
             }};
 
             // Append to `dataSet`

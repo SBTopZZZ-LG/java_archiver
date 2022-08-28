@@ -24,11 +24,11 @@ public class BinaryString extends Binary {
         return data.getBytes(StandardCharsets.UTF_8);
     }
 
-    public void fromByteArray(Byte[] bytes, boolean hasSizeBytes) {
-        data = new String(ByteArrayConversion.toPByteArray(Arrays.copyOfRange(bytes, hasSizeBytes ? 8 : 0, hasSizeBytes ? (int) (byteArrayToSize(ByteArrayConversion.toPByteArray(bytes)) + 8) : bytes.length)), StandardCharsets.UTF_8);
+    public void fromByteArray(byte[] bytes, boolean hasSizeBytes) {
+        data = new String(Arrays.copyOfRange(bytes, hasSizeBytes ? 8 : 0, hasSizeBytes ? (int) (byteArrayToSize(bytes) + 8) : bytes.length), StandardCharsets.UTF_8);
     }
     @Override
-    public void fromByteArray(Byte[] bytes) {
+    public void fromByteArray(byte[] bytes) {
         fromByteArray(bytes, true);
     }
 }

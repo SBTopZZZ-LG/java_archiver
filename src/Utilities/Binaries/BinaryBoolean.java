@@ -21,7 +21,7 @@ public class BinaryBoolean extends Binary {
     }
 
     @Override
-    public void fromByteArray(Byte[] bytes) {
+    public void fromByteArray(byte[] bytes) {
         data = (int)bytes[8] == 1;
     }
 }
