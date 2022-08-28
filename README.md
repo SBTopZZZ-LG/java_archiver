@@ -1,2 +1,2 @@
 # java_archiver
-A java project to create archives from directories
+A java program to create archives from directories
