@@ -1,9 +1,6 @@
 package Models;
 
-import Utilities.ByteArrayConversion;
-
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public abstract class Binary extends SerializableObject {
     private final ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);

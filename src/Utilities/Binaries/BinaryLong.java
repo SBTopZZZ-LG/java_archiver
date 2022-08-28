@@ -1,10 +1,8 @@
 package Utilities.Binaries;
 
 import Models.Binary;
-import Utilities.ByteArrayConversion;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class BinaryLong extends Binary {
     public long data;

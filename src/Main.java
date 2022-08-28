@@ -1,6 +1,5 @@
 import Models.Binary;
 import Utilities.Binaries.BinaryString;
-import Utilities.ByteArrayConversion;
 import Utilities.IO;
 import Utilities.SerializableFile;
 import com.bethecoder.ascii_table.ASCIITable;

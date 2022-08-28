@@ -1,7 +1,5 @@
 package Utilities;
 
-import java.util.List;
-
 public class ByteArrayConversion {
     public static byte[] toPByteArray(Byte[] bytes) {
         final byte[] bytes2 = new byte[bytes.length];

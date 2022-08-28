@@ -1,7 +1,6 @@
 package Utilities.Binaries;
 
 import Models.Binary;
-import Utilities.ByteArrayConversion;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
