@@ -22,7 +22,12 @@ public class IO {
     public static void getFilesAndDirs(String path, OnRetrieve onRetrieve) {
         File dir = new File(path);
 
-        for (final File dirFile : Objects.requireNonNull(dir.listFiles()))
+        // Handle NullPointerException safely with guard clause
+        final File[] files = dir.listFiles();
+        if (files == null)
+            return;
+
+        for (final File dirFile : files)
             if (dirFile.isDirectory()) {
                 onRetrieve.onFolderRetrieve(dirFile.getPath());
                 getFilesAndDirs(dirFile.getPath(), onRetrieve);
