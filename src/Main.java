@@ -16,19 +16,25 @@ public class Main {
     final static Scanner sc = new Scanner(System.in);
     final static BinaryString SIGNATURE = new BinaryString("archivitfile");
 
-    public static void main(String[] args) throws Exception {
-        System.out.print("1] Create Archive\n2] Extract an archive\n3] List archive contents\n> ");
+    public static void main(String[] args) {
+        System.out.print("Archivit v2\n1] Create Archive\n2] Extract an archive\n3] List archive contents\n> ");
         int option = sc.nextInt();
         sc.nextLine();
 
-        if (option == 1)
-            createArchive();
-        else if (option == 2)
-            extractArchive();
-        else if (option == 3)
-            listArchive();
-        else
-            System.out.println("Invalid option " + option);
+        try {
+            if (option == 1)
+                createArchive();
+            else if (option == 2)
+                extractArchive();
+            else if (option == 3)
+                listArchive();
+            else
+                System.out.println("Invalid option " + option);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            pause();
+        }
     }
 
     static void createArchive() throws IOException {
@@ -228,7 +234,7 @@ public class Main {
             // Append to `dataSet`
             dataSet.add(new String[] {
                     embeddedFile.name.data,
-                    "\\" + embeddedFile.path.data.replaceFirst(embeddedFile.name.data + "$", ""),
+                    "\\" + embeddedFile.path.data.replaceFirst(escapeMetaCharacters(embeddedFile.name.data) + "$", ""),
                     embeddedFile.canRead.data ? "Yes" : "No",
                     embeddedFile.canExecute.data ? "Yes" : "No",
                     embeddedFile.canWrite.data ? "Yes" : "No",
@@ -252,5 +258,22 @@ public class Main {
         inst.printTable(new String[] {
                 "Name", "Path", "Readable", "Executable", "Writable", "Last modified", "Size"
         }, dataSet2);
+    }
+
+    private static void pause() {
+        System.out.println("\nPress any key to continue...");
+        try {
+            System.in.read();
+        } catch (IOException ignored) {}
+    }
+
+    private static String escapeMetaCharacters(String inputString){
+        final String[] metaCharacters = {"\\","^","$","{","}","[","]","(",")",".","*","+","?","|","<",">","-","&","%"};
+
+        for (String metaCharacter : metaCharacters)
+            if (inputString.contains(metaCharacter))
+                inputString = inputString.replace(metaCharacter, "\\" + metaCharacter);
+
+        return inputString;
     }
 }
