@@ -85,32 +85,32 @@ public class SerializableFile extends SerializableObject {
                 + canWrite.getSize()
                 + lastModified.getSize()
                 + size.getSize()
-                + 8 * 7; // Additional bytes that represent lengths for each metadata
+                + 8 * 2; // Additional bytes that represent lengths for each metadata
     }
 
     /**
      * Serializes the object into a ByteArray
      * <li>Name length (8 bytes) + Name</li>
      * <li>Path length (8 bytes) + Path</li>
-     * <li>Can read length (8 bytes) + Can read (1 byte)</li>
-     * <li>Can execute length (8 bytes) + Can execute (1 byte)</li>
-     * <li>Can write length (8 bytes) + Can write (1 byte)</li>
-     * <li>Last modified length (8 bytes) + Last modified (8 bytes)</li>
-     * <li>File binary size length (8 bytes) + File binary size (8 bytes)</li>
-     * Metadata size >= 75 bytes (8 * 7 + 1 * 3 + 8 * 2)
+     * <li>Can read (1 byte)</li>
+     * <li>Can execute (1 byte)</li>
+     * <li>Can write (1 byte)</li>
+     * <li>Last modified (8 bytes)</li>
+     * <li>File binary size (8 bytes)</li>
+     * Metadata size >= 35 bytes (8 * 2 + 1 * 3 + 8 * 2)
      *
      * @return Serialized object
      */
     @Override
     public byte[] toByteArray() {
         return ByteArrayBuilder.build()
-                .appendBytes(name.sizeToByteArray(), name.toByteArray())                    // Name
-                .appendBytes(path.sizeToByteArray(), path.toByteArray())                    // Path
-                .appendBytes(canRead.sizeToByteArray(), canRead.toByteArray())              // Can read
-                .appendBytes(canExecute.sizeToByteArray(), canExecute.toByteArray())        // Can execute
-                .appendBytes(canWrite.sizeToByteArray(), canWrite.toByteArray())            // Can write
-                .appendBytes(lastModified.sizeToByteArray(), lastModified.toByteArray())    // Last modified
-                .appendBytes(size.sizeToByteArray(), size.toByteArray())                    // Size
+                .appendBytes(name.sizeToByteArray(), name.toByteArray())    // Name
+                .appendBytes(path.sizeToByteArray(), path.toByteArray())    // Path
+                .appendBytes(canRead.toByteArray())                         // Can read
+                .appendBytes(canExecute.toByteArray())                      // Can execute
+                .appendBytes(canWrite.toByteArray())                        // Can write
+                .appendBytes(lastModified.toByteArray())                    // Last modified
+                .appendBytes(size.toByteArray())                            // Size
                 .toByteArray();
     }
 
@@ -120,89 +120,61 @@ public class SerializableFile extends SerializableObject {
         int segmentSize;
         byte[] segmentSizeBytes = new byte[8];
         try {
-            // Name
-            segmentSize = 8;
-            bis.readNBytes(segmentSizeBytes, 0, segmentSize);
-            segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
+            // Name (8 + x bytes)
+            bis.readNBytes(segmentSizeBytes, 0, segmentSizeBytes.length);
+            segmentSize = (int) Binary.byteArrayToSize(segmentSizeBytes);
 
             name.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize - 8))
+                            .appendBytes(bis.readNBytes(segmentSize))
                             .toByteArray());
             // Name
 
-            // Path
-            segmentSize = 8;
-            bis.readNBytes(segmentSizeBytes, 0, segmentSize);
-            segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
+            // Path (8 + x bytes)
+            bis.readNBytes(segmentSizeBytes, 0, segmentSizeBytes.length);
+            segmentSize = (int) Binary.byteArrayToSize(segmentSizeBytes);
 
             path.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize - 8))
+                            .appendBytes(bis.readNBytes(segmentSize))
                             .toByteArray());
             // Path
 
-            // Can read
-            segmentSize = 8;
-            bis.readNBytes(segmentSizeBytes, 0, segmentSize);
-            segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
-
+            // Can read (1 byte)
             canRead.fromByteArray(
                     ByteArrayBuilder.build()
-                            .appendBytes(segmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize - 8))
+                            .appendBytes(bis.readNBytes(1))
                             .toByteArray());
             // Can read
 
-            // Can execute
-            segmentSize = 8;
-            bis.readNBytes(segmentSizeBytes, 0, segmentSize);
-            segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
-
+            // Can execute (1 byte)
             canExecute.fromByteArray(
                     ByteArrayBuilder.build()
-                            .appendBytes(segmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize - 8))
+                            .appendBytes(bis.readNBytes(1))
                             .toByteArray());
-
             // Can execute
 
-            // Can write
-            segmentSize = 8;
-            bis.readNBytes(segmentSizeBytes, 0, segmentSize);
-            segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
-
+            // Can write (1 byte)
             canWrite.fromByteArray(
                     ByteArrayBuilder.build()
-                            .appendBytes(segmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize - 8))
+                            .appendBytes(bis.readNBytes(1))
                             .toByteArray());
             // Can write
 
-            // Last modified
-            segmentSize = 8;
-            bis.readNBytes(segmentSizeBytes, 0, segmentSize);
-            segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
-
+            // Last modified (8 bytes)
             lastModified.fromByteArray(
                     ByteArrayBuilder.build()
-                            .appendBytes(segmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize - 8))
+                            .appendBytes(bis.readNBytes(8))
                             .toByteArray()
             );
             // Last modified
 
-            // Size
-            segmentSize = 8;
-            bis.readNBytes(segmentSizeBytes, 0, segmentSize);
-            segmentSize += Binary.byteArrayToSize(segmentSizeBytes);
-
+            // Size (8 bytes)
             size.fromByteArray(
                     ByteArrayBuilder.build()
-                            .appendBytes(segmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize - 8))
+                            .appendBytes(bis.readNBytes(8))
                             .toByteArray()
             );
             // Size

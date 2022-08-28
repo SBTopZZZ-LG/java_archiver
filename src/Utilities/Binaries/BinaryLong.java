@@ -27,6 +27,6 @@ public class BinaryLong extends Binary {
 
     @Override
     public void fromByteArray(byte[] bytes) {
-        data = buffer.position(0).put(0, ByteArrayConversion.toPByteArray(Arrays.copyOfRange(ByteArrayConversion.toByteArray(bytes), 8, 8 + getSize()))).getLong();
+        data = buffer.position(0).put(0, bytes).getLong();
     }
 }
