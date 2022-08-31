@@ -24,7 +24,7 @@ public class Main {
     public static final int NONCE_LENGTH = 12;
 
     public static void main(String[] args) {
-        System.out.print("Archivit v2\n1] Create Archive\n2] Extract an archive\n3] List archive contents\n> ");
+        System.out.print("Archivit v3\n1] Create Archive\n2] Extract an archive\n3] List archive contents\n> ");
         int option = sc.nextInt();
         sc.nextLine();
 
