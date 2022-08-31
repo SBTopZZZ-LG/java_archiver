@@ -43,29 +43,27 @@ public class SerializableFile extends SerializableObject {
         size = new BinaryLong(file.length());
     }
 
-    public boolean createFile(byte[] binaryData) throws IOException {
+    public interface CreateFileCallback {
+        void writeBinaryData(final File file);
+    }
+    public boolean createFile(CreateFileCallback callback) throws IOException {
         {
             // Create path if it does not exist
             File temp = new File(path.data);
             if (!temp.exists())
                 temp.mkdirs();
-        }
-        {
+
             // Create file (or overwrite if already exists)
-            File temp = new File(path.data);
             if (temp.exists())
-                temp.delete();
+                if (!temp.delete())
+                    return false;
             if (!temp.createNewFile())
                 return false;
         }
 
         File file = new File(path.data);
 
-        FileOutputStream fos = new FileOutputStream(file);
-        fos.write(binaryData);
-
-        fos.flush();
-        fos.close();
+        callback.writeBinaryData(file);
 
         // Write metadata in the end to avoid permission(s) error (when canWrite.data is False)
         file.setReadable(canRead.data);
@@ -128,7 +126,8 @@ public class SerializableFile extends SerializableObject {
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize))
-                            .toByteArray());
+                            .toByteArray()
+            );
             // Name
 
             // Path (8 + x bytes)
@@ -139,28 +138,32 @@ public class SerializableFile extends SerializableObject {
                     ByteArrayBuilder.build()
                             .appendBytes(segmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize))
-                            .toByteArray());
+                            .toByteArray()
+            );
             // Path
 
             // Can read (1 byte)
             canRead.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(bis.readNBytes(1))
-                            .toByteArray());
+                            .toByteArray()
+            );
             // Can read
 
             // Can execute (1 byte)
             canExecute.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(bis.readNBytes(1))
-                            .toByteArray());
+                            .toByteArray()
+            );
             // Can execute
 
             // Can write (1 byte)
             canWrite.fromByteArray(
                     ByteArrayBuilder.build()
                             .appendBytes(bis.readNBytes(1))
-                            .toByteArray());
+                            .toByteArray()
+            );
             // Can write
 
             // Last modified (8 bytes)
