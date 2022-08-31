@@ -1,6 +1,7 @@
 package Utilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -13,11 +14,37 @@ public class IO {
     };
 
     public interface OnRetrieve {
+        /**
+         * Called when a file is retrieved from the Disk
+         * @param file File path (absolute)
+         */
         void onFileRetrieve(String file);
+
+        /**
+         * Called when a folder is retrieved from the Disk
+         * @param folder Folder path (absolute)
+         */
         void onFolderRetrieve(String folder);
-        void onSymLinkFileRetrieve(String symLinkPath);
+
+        /**
+         * Called when a file symbolic link is retrieved from the Disk
+         * @param symLinkPath File symbolic link path (absolute)
+         * @param canonicalPath File symbolic link canonical path
+         */
+        void onSymLinkFileRetrieve(String symLinkPath, String canonicalPath);
+
+        /**
+         * Called when a file which is flagged as exclusive is retrieved from the Disk
+         * @param file File path (absolute)
+         */
         void onExclusion(String file);
     }
+
+    /**
+     * Retrieves a list of all files and folders (recursive) from a specified path
+     * @param path Path
+     * @param onRetrieve Callback
+     */
     public static void getFilesAndDirs(String path, OnRetrieve onRetrieve) {
         File dir = new File(path);
 
@@ -36,7 +63,11 @@ public class IO {
                     extension = "." + extension;
                 if (!extension.equals("") && Arrays.stream(EXCLUSIONS).noneMatch(extension::equals)) {
                     if (Files.isSymbolicLink(dirFile.toPath()))
-                        onRetrieve.onSymLinkFileRetrieve(dirFile.getPath());
+                        try {
+                            onRetrieve.onSymLinkFileRetrieve(dirFile.getPath(), dirFile.getCanonicalPath());
+                        } catch (IOException ignored) {
+                            onRetrieve.onSymLinkFileRetrieve(dirFile.getPath(), null);
+                        }
                     else
                         onRetrieve.onFileRetrieve(dirFile.getPath());
                 } else
@@ -44,6 +75,11 @@ public class IO {
             }
     }
 
+    /**
+     * Returns the file name without the extension
+     * @param fileName File name
+     * @return File name without extension
+     */
     public static String getFileNameWithoutExtension(String fileName) {
         if (!fileName.contains("."))
             return fileName;

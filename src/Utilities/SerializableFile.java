@@ -27,7 +27,14 @@ public class SerializableFile extends SerializableObject {
         lastModified = new BinaryLong();
         size = new BinaryLong();
     }
-    public SerializableFile(String path, String relativePath) throws IOException {
+
+    /**
+     * Initializes a new SerializableFile instance and retrieves all details from the file
+     * @param path File path
+     * @param relativePath File relative path
+     * @exception InvalidPathException Thrown if specified file does not exist or is invalid
+     */
+    public SerializableFile(String path, String relativePath) throws InvalidPathException {
         File file = new File(path);
         if (!Files.exists(Path.of(path)) || file.isDirectory())
             throw new InvalidPathException(path, "Path does not exist or is a directory");
@@ -46,6 +53,12 @@ public class SerializableFile extends SerializableObject {
     public interface CreateFileCallback {
         void writeBinaryData(final File file);
     }
+
+    /**
+     * Creates a new file at desired path and adds the necessary attributes
+     * @param callback Callback (to write file binary data)
+     * @return `true` if successful, otherwise `false`
+     */
     public boolean createFile(CreateFileCallback callback) throws IOException {
         {
             // Create path if it does not exist
@@ -112,6 +125,10 @@ public class SerializableFile extends SerializableObject {
                 .toByteArray();
     }
 
+    /**
+     * Deserializes byte array and updates the object data
+     * @param byteStream Byte stream to deserialize
+     */
     public void fromByteArray(BufferedInputStream byteStream) {
         BufferedInputStream bis = new BufferedInputStream(byteStream);
 

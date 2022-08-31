@@ -193,7 +193,7 @@ public class Main {
             public void onFolderRetrieve(String folder) {}
 
             @Override
-            public void onSymLinkFileRetrieve(String symLinkPath) {
+            public void onSymLinkFileRetrieve(String symLinkPath, String canonicalPath) {
                 System.out.println("Excluding SymLink file: " + new File(symLinkPath).getName());
             }
 
@@ -422,6 +422,9 @@ public class Main {
         }, dataSet2);
     }
 
+    /**
+     * Pauses the console (awaits user prompt)
+     */
     private static void pause() {
         System.out.println("\nPress any key to continue...");
         try {
@@ -429,6 +432,11 @@ public class Main {
         } catch (IOException ignored) {}
     }
 
+    /**
+     * Escapes unnecessary regex characters from a string
+     * @param inputString String to escape
+     * @return Escaped string
+     */
     private static String escapeMetaCharacters(String inputString){
         final String[] metaCharacters = {"\\","^","$","{","}","[","]","(",")",".","*","+","?","|","<",">","-","&","%"};
 
@@ -439,6 +447,10 @@ public class Main {
         return inputString;
     }
 
+    /**
+     * Accesses OS-specific file separator
+     * @return File separator
+     */
     private static String getFileSeparator() {
         return System.getProperty("file.separator");
     }

@@ -10,19 +10,56 @@ public class BufferedStream {
     }
 
     public interface JavaStreamReadSegmentCallback {
+        /**
+         * Called when the desired segment is fetched
+         * @param bytes Fetched byte array (without length bytes)
+         * @param segmentType `INTEGER` if four bytes were used to include length, otherwise `LONG`, in which case eight bytes were used
+         */
         void onSegmentRetrieve(final byte[] bytes, final JavaStreamSegmentType segmentType);
     }
     public interface JavaStreamWrite {
+        /**
+         * Writes a segment into the stream
+         * <li>Length bytes (either four or eight bytes)</li>
+         * <li>`bytes`</li>
+         * @param bytes Segment body
+         * @param segmentType Four bytes will be used to determine the segment length if segment type is `INTEGER`, and eight bytes if `LONG`
+         */
         void writeSegment(byte[] bytes, JavaStreamSegmentType segmentType);
     }
     public interface JavaStreamRead {
+        /**
+         * Accesses a segment body
+         * @param segmentType Segment type to interpret length bytes size
+         * @return Segment body
+         */
         byte[] readSegment(final JavaStreamSegmentType segmentType);
+
+        /**
+         * Accesses a segment body
+         * @param segmentType Segment type to interpret length bytes size
+         * @param callback Callback
+         */
         void readSegment(final JavaStreamSegmentType segmentType, final JavaStreamReadSegmentCallback callback);
     }
 
     public interface ParsableInput {
+        /**
+         * Reads and interprets next four bytes as an integer
+         * @return Value
+         */
         int getInt();
+
+        /**
+         * Reads and interprets next eight bytes as a long
+         * @return Value
+         */
         long getLong();
+
+        /**
+         * Reads and interprets next one byte as a boolean
+         * @return Value
+         */
         boolean getBoolean();
     }
     public static class Input extends BufferedInputStream implements JavaStreamRead, ParsableInput {
@@ -117,8 +154,22 @@ public class BufferedStream {
     }
 
     public interface ParsableOutput {
+        /**
+         * Interprets and writes integer `value` in next four bytes
+         * @param value Integer to interpret
+         */
         void putInt(int value);
+
+        /**
+         * Interprets and writes long `value` in next eight bytes
+         * @param value Long to interpret
+         */
         void putLong(long value);
+
+        /**
+         * Interprets and writes boolean `value` in next one byte
+         * @param value Boolean to interpret
+         */
         void putBoolean(boolean value);
     }
     public static class Output extends BufferedOutputStream implements JavaStreamWrite, ParsableOutput {
