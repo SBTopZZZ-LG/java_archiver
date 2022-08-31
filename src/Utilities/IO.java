@@ -43,4 +43,16 @@ public class IO {
                     onRetrieve.onExclusion(dirFile.getPath());
             }
     }
+
+    public static String getFileNameWithoutExtension(String fileName) {
+        if (!fileName.contains("."))
+            return fileName;
+
+        StringBuilder result = new StringBuilder();
+        final String[] split = fileName.split("\\.");
+        for (int i = 0; i < split.length - 1; i++)
+            result.append(split[i]);
+
+        return result.toString();
+    }
 }

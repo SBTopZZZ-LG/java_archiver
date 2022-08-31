@@ -7,6 +7,7 @@ import Utilities.SerializableFile;
 import com.bethecoder.ascii_table.ASCIITable;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
@@ -46,8 +47,8 @@ public class Main {
     static void createArchive() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         System.out.println("Enter folder path to archive: ");
         String folderPath = sc.nextLine();
-        if (!folderPath.endsWith("\\"))
-            folderPath += "\\";
+        if (!folderPath.endsWith(getFileSeparator()))
+            folderPath += getFileSeparator();
 
         if (!Files.exists(Path.of(folderPath)) || !(new File(folderPath).isDirectory())) {
             System.out.println("Provided path is not a valid directory!");
@@ -102,6 +103,9 @@ public class Main {
 
         // Write file signature
         bso.write(SIGNATURE.toByteArray());
+
+        // Write Operating-system specific file separator used in the archive
+        bso.write(getFileSeparator().getBytes(StandardCharsets.UTF_8));
 
         // If user wishes to use password protection, set byte to `1`
         bso.write(new byte[] {(byte)(isPasswordProtected ? 1 : 0)});
@@ -219,13 +223,13 @@ public class Main {
 
         System.out.println("Enter extraction path (a folder with the archive name will be created): ");
         String extractPath = sc.nextLine();
-        if (!extractPath.endsWith("\\"))
-            extractPath += "\\";
+        if (!extractPath.endsWith(getFileSeparator()))
+            extractPath += getFileSeparator();
         if (new File(extractPath).isFile()) {
             System.out.println("Provided path is not a valid directory");
             return;
         }
-        extractPath += new File(archivePath).getName().split("\\.")[0] + "\\";
+        extractPath += IO.getFileNameWithoutExtension(new File(archivePath).getName()) + getFileSeparator();
         if (!(new File(extractPath).exists()) && !(new File(extractPath).mkdirs())) {
             System.out.println("Cannot create extraction path");
             return;
@@ -241,6 +245,9 @@ public class Main {
             System.out.println("Specified archive file is not a valid Archivit archive!");
             return;
         }
+
+        // Get file separator character
+        final String fileSeparator = new String(bsi.readNBytes(1), StandardCharsets.UTF_8);
 
         // Check if archive is password-protected
         boolean isPasswordProtected = bsi.getBoolean();
@@ -268,6 +275,10 @@ public class Main {
                 fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG));
             }};
             embeddedFile.path.data = extractPath + embeddedFile.path.data;
+
+            // Fix file separator (if there is a mismatch)
+            if (!fileSeparator.equals(getFileSeparator()))
+                embeddedFile.path.data = embeddedFile.path.data.replace(fileSeparator, getFileSeparator());
 
             System.out.print("Extract file: " + embeddedFile.path.data.replace(extractPath, "") + " (" + Binary.getFormattedSize(embeddedFile.size.data) + ") ");
 
@@ -347,33 +358,40 @@ public class Main {
             return;
         }
 
-        BufferedStream.Input bis = new BufferedStream.Input(new FileInputStream(archivePath));
+        BufferedStream.Input bsi = new BufferedStream.Input(new FileInputStream(archivePath));
 
         // Check signature
         BinaryString signature = new BinaryString() {{
-            fromByteArray(bis.readNBytes(SIGNATURE.getSize()), false);
+            fromByteArray(bsi.readNBytes(SIGNATURE.getSize()), false);
         }};
         if (!signature.data.equals(SIGNATURE.data)) {
             System.out.println("Specified archive file is not a valid Archivit archive!");
             return;
         }
 
+        // Get file separator character
+        final String fileSeparator = new String(bsi.readNBytes(1), StandardCharsets.UTF_8);
+
         // Skip password-protection flag byte and nonce bytes (if exists)
-        boolean isPasswordProtected = bis.getBoolean();
+        boolean isPasswordProtected = bsi.getBoolean();
         if (isPasswordProtected)
-            bis.skipNBytes(NONCE_LENGTH);
+            bsi.skipNBytes(NONCE_LENGTH);
 
         List<String[]> dataSet = new ArrayList<>();
 
-        while (bis.available() > 0) {
+        while (bsi.available() > 0) {
             SerializableFile embeddedFile = new SerializableFile() {{
-                fromByteArray(bis.readSegment(BufferedStream.JavaStreamSegmentType.LONG));
+                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG));
             }};
+
+            // Fix file separator (if there is a mismatch)
+            if (!fileSeparator.equals(getFileSeparator()))
+                embeddedFile.path.data = embeddedFile.path.data.replace(fileSeparator, getFileSeparator());
 
             // Append to `dataSet`
             dataSet.add(new String[] {
                     embeddedFile.name.data,
-                    "\\" + embeddedFile.path.data.replaceFirst(escapeMetaCharacters(embeddedFile.name.data) + "$", ""),
+                    getFileSeparator() + embeddedFile.path.data.replaceFirst(escapeMetaCharacters(embeddedFile.name.data) + "$", ""),
                     embeddedFile.canRead.data ? "Yes" : "No",
                     embeddedFile.canExecute.data ? "Yes" : "No",
                     embeddedFile.canWrite.data ? "Yes" : "No",
@@ -383,14 +401,14 @@ public class Main {
 
             // Skip file binary data
             if (!isPasswordProtected)
-                bis.skipNBytes((int) embeddedFile.size.data);
+                bsi.skipNBytes((int) embeddedFile.size.data);
             else {
-                while (bis.getBoolean())
-                    bis.skipNBytes(bis.getLong());
+                while (bsi.getBoolean())
+                    bsi.skipNBytes(bsi.getLong());
             }
         }
 
-        bis.close();
+        bsi.close();
 
         // Convert List<String[]> to String[][]
         String[][] dataSet2 = new String[dataSet.size()][];
@@ -419,5 +437,9 @@ public class Main {
                 inputString = inputString.replace(metaCharacter, "\\" + metaCharacter);
 
         return inputString;
+    }
+
+    private static String getFileSeparator() {
+        return System.getProperty("file.separator");
     }
 }
