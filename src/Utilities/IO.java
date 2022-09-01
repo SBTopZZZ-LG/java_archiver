@@ -87,7 +87,7 @@ public class IO {
         StringBuilder result = new StringBuilder();
         final String[] split = fileName.split("\\.");
         for (int i = 0; i < split.length - 1; i++)
-            result.append(split[i]);
+            result.append(split[i]).append(i < split.length - 1 - 1 ? "." : "");
 
         return result.toString();
     }
