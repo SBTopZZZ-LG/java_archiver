@@ -3,16 +3,51 @@ package Models;
 import java.nio.ByteBuffer;
 
 public abstract class Binary extends SerializableObject {
-    private final ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-    private static final ByteBuffer staticBuffer = ByteBuffer.allocate(Long.BYTES);
+    private final ByteBuffer shortBuffer = ByteBuffer.allocate(Short.BYTES);
+    private final ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
+    private final ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
 
+    private static final ByteBuffer shortStaticBuffer = ByteBuffer.allocate(Short.BYTES);
+    private static final ByteBuffer intStaticBuffer = ByteBuffer.allocate(Integer.BYTES);
+    private static final ByteBuffer longStaticBuffer = ByteBuffer.allocate(Long.BYTES);
+
+    public enum SizeType {
+        LONG,
+        INTEGER,
+        SHORT
+    }
     /**
      * Converts and returns size to byte array
+     * @param sizeType Size data type
      * @return Byte array
      */
-    public byte[] sizeToByteArray() {
-        buffer.putLong(0, getSize());
-        return buffer.array();
+    public byte[] sizeToByteArray(SizeType sizeType) {
+        if (sizeType == SizeType.LONG)
+            longBuffer.position(0).putLong(0, getSize());
+        else if (sizeType == SizeType.INTEGER)
+            intBuffer.position(0).putInt(0, getSize());
+        else if (sizeType == SizeType.SHORT)
+            shortBuffer.position(0).putShort(0, (short) getSize());
+
+        return sizeType == SizeType.LONG ? longBuffer.array() :
+                (sizeType == SizeType.INTEGER ? intBuffer.array() :
+                        (sizeType == SizeType.SHORT ? shortBuffer.array() : null));
+    }
+    /**
+     * Converts and returns size from byte array
+     * @param byteArray Byte array to convert
+     * @param sizeType Size data type
+     * @return Size after conversion
+     */
+    public static long byteArrayToSize(byte[] byteArray, SizeType sizeType) {
+        if (sizeType == SizeType.LONG)
+            return longStaticBuffer.position(0).put(byteArray, 0, 8).flip().getLong();
+        else if (sizeType == SizeType.INTEGER)
+            return intStaticBuffer.position(0).put(byteArray, 0, 4).flip().getInt();
+        else if (sizeType == SizeType.SHORT)
+            return shortStaticBuffer.position(0).put(byteArray, 0, 2).flip().getShort();
+
+        return 0;
     }
 
     /**
@@ -21,7 +56,7 @@ public abstract class Binary extends SerializableObject {
      * @return Byte array
      */
     public static byte[] sizeToByteArray(long size) {
-        return staticBuffer.position(0).putLong(size).array();
+        return longStaticBuffer.position(0).putLong(size).array();
     }
 
     /**
@@ -30,7 +65,7 @@ public abstract class Binary extends SerializableObject {
      * @return Size after conversion
      */
     public static long byteArrayToSize(byte[] byteArray) {
-        return staticBuffer.position(0).put(byteArray, 0, 8).flip().getLong();
+        return longStaticBuffer.position(0).put(byteArray, 0, 8).flip().getLong();
     }
 
     /**

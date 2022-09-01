@@ -96,32 +96,32 @@ public class SerializableFile extends SerializableObject {
                 + canWrite.getSize()
                 + lastModified.getSize()
                 + size.getSize()
-                + 8 * 2; // Additional bytes that represent lengths for each metadata
+                + 2 * 2; // Additional bytes that represent lengths for each metadata (name and path)
     }
 
     /**
      * Serializes the object into a ByteArray
-     * <li>Name length (8 bytes) + Name</li>
-     * <li>Path length (8 bytes) + Path</li>
+     * <li>Name length (Max. of 260 bytes for DOS, and 255 for UNIX) (2 bytes) + Name</li>
+     * <li>Path length (Max. of 32,000 bytes for NTFS, and 4,096 for UNIX) (2 bytes) + Path</li>
      * <li>Can read (1 byte)</li>
      * <li>Can execute (1 byte)</li>
      * <li>Can write (1 byte)</li>
      * <li>Last modified (8 bytes)</li>
      * <li>File binary size (8 bytes)</li>
-     * Metadata size >= 35 bytes (8 * 2 + 1 * 3 + 8 * 2)
+     * Metadata size >= 23 bytes (2 * 2 + 1 * 3 + 8 * 2)
      *
      * @return Serialized object
      */
     @Override
     public byte[] toByteArray() {
         return ByteArrayBuilder.build()
-                .appendBytes(name.sizeToByteArray(), name.toByteArray())    // Name
-                .appendBytes(path.sizeToByteArray(), path.toByteArray())    // Path
-                .appendBytes(canRead.toByteArray())                         // Can read
-                .appendBytes(canExecute.toByteArray())                      // Can execute
-                .appendBytes(canWrite.toByteArray())                        // Can write
-                .appendBytes(lastModified.toByteArray())                    // Last modified
-                .appendBytes(size.toByteArray())                            // Size
+                .appendBytes(name.sizeToByteArray(Binary.SizeType.SHORT), name.toByteArray()) // Name
+                .appendBytes(path.sizeToByteArray(Binary.SizeType.SHORT), path.toByteArray()) // Path
+                .appendBytes(canRead.toByteArray()) // Can read
+                .appendBytes(canExecute.toByteArray()) // Can execute
+                .appendBytes(canWrite.toByteArray()) // Can write
+                .appendBytes(lastModified.toByteArray()) // Last modified
+                .appendBytes(size.toByteArray()) // Size
                 .toByteArray();
     }
 
@@ -133,27 +133,27 @@ public class SerializableFile extends SerializableObject {
         BufferedInputStream bis = new BufferedInputStream(byteStream);
 
         int segmentSize;
-        byte[] segmentSizeBytes = new byte[8];
+        byte[] shortSegmentSizeBytes = new byte[2];
         try {
-            // Name (8 + x bytes)
-            bis.readNBytes(segmentSizeBytes, 0, segmentSizeBytes.length);
-            segmentSize = (int) Binary.byteArrayToSize(segmentSizeBytes);
+            // Name (2 + x bytes)
+            bis.readNBytes(shortSegmentSizeBytes, 0, 2);
+            segmentSize = (int) Binary.byteArrayToSize(shortSegmentSizeBytes, Binary.SizeType.SHORT);
 
             name.fromByteArray(
                     ByteArrayBuilder.build()
-                            .appendBytes(segmentSizeBytes)
+                            .appendBytes(shortSegmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize))
                             .toByteArray()
             );
             // Name
 
-            // Path (8 + x bytes)
-            bis.readNBytes(segmentSizeBytes, 0, segmentSizeBytes.length);
-            segmentSize = (int) Binary.byteArrayToSize(segmentSizeBytes);
+            // Path (2 + x bytes)
+            bis.readNBytes(shortSegmentSizeBytes, 0, 2);
+            segmentSize = (int) Binary.byteArrayToSize(shortSegmentSizeBytes, Binary.SizeType.SHORT);
 
             path.fromByteArray(
                     ByteArrayBuilder.build()
-                            .appendBytes(segmentSizeBytes)
+                            .appendBytes(shortSegmentSizeBytes)
                             .appendBytes(bis.readNBytes(segmentSize))
                             .toByteArray()
             );
