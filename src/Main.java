@@ -1,3 +1,4 @@
+import Configs.ErrorCodes;
 import Models.Binary;
 import Utilities.Binaries.BinaryString;
 import Utilities.BufferedStream;
@@ -6,6 +7,7 @@ import Utilities.IO;
 import Utilities.SerializableFile;
 import com.bethecoder.ascii_table.ASCIITable;
 
+import javax.crypto.AEADBadTagException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -211,7 +213,7 @@ public class Main {
         System.out.println("Archive was successfully created");
     }
 
-    static void extractArchive() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    static void extractArchive() throws IOException, NoSuchAlgorithmException {
         System.out.println("Enter archive path: ");
         String archivePath = sc.nextLine();
         if (!archivePath.endsWith(".archivit"))
@@ -260,7 +262,13 @@ public class Main {
                 if (password.length() < 6 || password.length() > 16 || password.trim().length() == 0)
                     System.out.print("Please enter a password which is:\n* At least 6 characters and at most 16 characters long\n* Must not be a whitespace sequence\n> ");
                 else {
-                    kit = new CipherKit(bsi.readNBytes(NONCE_LENGTH), password);
+                    try {
+                        kit = new CipherKit(bsi.readNBytes(NONCE_LENGTH), password);
+                    } catch (InvalidKeySpecException ignored) {
+                        bsi.close();
+                        System.out.println("Password does not match!");
+                        System.exit(ErrorCodes.PASSWORD_MISMATCH);
+                    }
                     break;
                 }
             } while (true);
@@ -295,6 +303,9 @@ public class Main {
                                     public void onSegmentRetrieve(byte[] bytes, BufferedStream.JavaStreamSegmentType segmentType) {
                                         try {
                                             fos.write(kit2.exec(bytes, CipherKit.CipherMode.DECRYPT));
+                                        } catch (AEADBadTagException e) {
+                                            System.out.println("Password does not match!");
+                                            System.exit(ErrorCodes.PASSWORD_MISMATCH);
                                         } catch (Exception e) {
                                             throw new RuntimeException(e);
                                         }
