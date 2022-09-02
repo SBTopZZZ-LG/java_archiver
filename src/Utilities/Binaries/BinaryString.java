@@ -26,10 +26,9 @@ public class BinaryString extends Binary {
     /**
      * Deserializes byte array and updates the object data
      * @param bytes Byte array to deserialize
-     * @param hasSizeBytes If byte array is a segment and includes the length
      */
     @Override
-    public void fromByteArray(byte[] bytes, final boolean hasSizeBytes) {
-        data = new String(hasSizeBytes ? Arrays.copyOfRange(bytes, 2, (int) (byteArrayToSize(bytes, SizeType.SHORT) + 2)) : bytes, StandardCharsets.UTF_8);
+    public void fromByteArray(byte[] bytes) {
+        data = new String(bytes, StandardCharsets.UTF_8);
     }
 }

@@ -139,11 +139,11 @@ public class SerializableFile extends SerializableObject {
         try {
             // Name (2 + x bytes)
             segmentSize = bsi.getShort();
-            name.fromByteArray(bsi.readNBytes(segmentSize), false);
+            name.fromByteArray(bsi.readNBytes(segmentSize));
 
             // Path (2 + x bytes)
             segmentSize = bsi.getShort();
-            path.fromByteArray(bsi.readNBytes(segmentSize), false);
+            path.fromByteArray(bsi.readNBytes(segmentSize));
 
             // Can read (1 byte)
             canRead.fromByteArray(bsi.readNBytes(1));
@@ -167,8 +167,7 @@ public class SerializableFile extends SerializableObject {
     }
 
     @Override
-    public void fromByteArray(byte[] bytes, final boolean hasSizeBytes) {
-        // Ignore `hasSizeBytes` as segment size is pre-evaluated and is segregated from `bytes`
+    public void fromByteArray(byte[] bytes) {
         fromByteArray(new BufferedInputStream(new ByteArrayInputStream(bytes)));
     }
 }

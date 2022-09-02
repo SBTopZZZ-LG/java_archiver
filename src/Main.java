@@ -242,7 +242,7 @@ public class Main {
 
         // Check signature
         BinaryString signature = new BinaryString() {{
-            fromByteArray(bsi.readNBytes(SIGNATURE.getSize()), false);
+            fromByteArray(bsi.readNBytes(SIGNATURE.getSize()));
         }};
         if (!signature.data.equals(SIGNATURE.data)) {
             System.out.println("Specified archive file is not a valid Archivit archive!");
@@ -281,7 +281,7 @@ public class Main {
         final CipherKit kit2 = kit;
         while (bsi.available() > 0) {
             SerializableFile embeddedFile = new SerializableFile() {{
-                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG), false);
+                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG));
             }};
             embeddedFile.path.data = extractPath + embeddedFile.path.data;
 
@@ -374,7 +374,7 @@ public class Main {
 
         // Check signature
         BinaryString signature = new BinaryString() {{
-            fromByteArray(bsi.readNBytes(SIGNATURE.getSize()), false);
+            fromByteArray(bsi.readNBytes(SIGNATURE.getSize()));
         }};
         if (!signature.data.equals(SIGNATURE.data)) {
             System.out.println("Specified archive file is not a valid Archivit archive!");
@@ -393,7 +393,7 @@ public class Main {
 
         while (bsi.available() > 0) {
             SerializableFile embeddedFile = new SerializableFile() {{
-                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG), false);
+                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG));
             }};
 
             // Fix file separator (if there is a mismatch)
