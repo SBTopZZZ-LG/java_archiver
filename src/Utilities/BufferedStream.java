@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 
 public class BufferedStream {
     public enum JavaStreamSegmentType {
+        SHORT,
         INTEGER,
         LONG
     }
@@ -45,6 +46,12 @@ public class BufferedStream {
 
     public interface ParsableInput {
         /**
+         * Reads and interprets next two bytes as an integer
+         * @return Value
+         */
+        short getShort();
+
+        /**
          * Reads and interprets next four bytes as an integer
          * @return Value
          */
@@ -63,6 +70,7 @@ public class BufferedStream {
         boolean getBoolean();
     }
     public static class Input extends BufferedInputStream implements JavaStreamRead, ParsableInput {
+        private final ByteBuffer shortBuffer = ByteBuffer.allocate(Short.BYTES);
         private final ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
         private final ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
 
@@ -72,7 +80,18 @@ public class BufferedStream {
 
         @Override
         public byte[] readSegment(JavaStreamSegmentType segmentType) {
-            if (segmentType == JavaStreamSegmentType.INTEGER)
+            if (segmentType == JavaStreamSegmentType.SHORT) {
+                try {
+                    int segmentSize = getShort();
+
+                    if (segmentSize < 0)
+                        throw new Exception("Segment size was negative");
+
+                    return readNBytes(segmentSize);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (segmentType == JavaStreamSegmentType.INTEGER)
                 try {
                     int segmentSize = getInt();
 
@@ -100,7 +119,18 @@ public class BufferedStream {
 
         @Override
         public void readSegment(JavaStreamSegmentType segmentType, JavaStreamReadSegmentCallback callback) {
-            if (segmentType == JavaStreamSegmentType.INTEGER) {
+            if (segmentType == JavaStreamSegmentType.SHORT) {
+                try {
+                    int segmentSize = getShort();
+
+                    if (segmentSize < 0)
+                        throw new Exception("Segment size was negative");
+
+                    callback.onSegmentRetrieve(readNBytes(segmentSize), segmentType);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (segmentType == JavaStreamSegmentType.INTEGER) {
                 try {
                     int segmentSize = getInt();
 
@@ -122,6 +152,15 @@ public class BufferedStream {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+
+        @Override
+        public short getShort() {
+            try {
+                return shortBuffer.position(0).put(readNBytes(2)).flip().getShort();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -155,6 +194,12 @@ public class BufferedStream {
 
     public interface ParsableOutput {
         /**
+         * Interprets and writes short `value` in next two bytes
+         * @param value Short to interpret
+         */
+        void putShort(short value);
+
+        /**
          * Interprets and writes integer `value` in next four bytes
          * @param value Integer to interpret
          */
@@ -173,6 +218,7 @@ public class BufferedStream {
         void putBoolean(boolean value);
     }
     public static class Output extends BufferedOutputStream implements JavaStreamWrite, ParsableOutput {
+        private final ByteBuffer shortBuffer = ByteBuffer.allocate(Short.BYTES);
         private final ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
         private final ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
 
@@ -183,7 +229,9 @@ public class BufferedStream {
         @Override
         public void writeSegment(byte[] bytes, JavaStreamSegmentType segmentType) {
             try {
-                if (segmentType == JavaStreamSegmentType.INTEGER)
+                if (segmentType == JavaStreamSegmentType.SHORT)
+                    putShort((short) bytes.length);
+                else if (segmentType == JavaStreamSegmentType.INTEGER)
                     putInt(bytes.length);
                 else if (segmentType == JavaStreamSegmentType.LONG)
                     putLong(bytes.length);
@@ -192,6 +240,15 @@ public class BufferedStream {
 
                 write(bytes);
             } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void putShort(short value) {
+            try {
+                write(shortBuffer.position(0).putShort(value).array());
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }

@@ -6,7 +6,10 @@ import Utilities.Binaries.BinaryBoolean;
 import Utilities.Binaries.BinaryLong;
 import Utilities.Binaries.BinaryString;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -130,81 +133,42 @@ public class SerializableFile extends SerializableObject {
      * @param byteStream Byte stream to deserialize
      */
     public void fromByteArray(BufferedInputStream byteStream) {
-        BufferedInputStream bis = new BufferedInputStream(byteStream);
+        BufferedStream.Input bsi = new BufferedStream.Input(byteStream);
 
         int segmentSize;
-        byte[] shortSegmentSizeBytes = new byte[2];
         try {
             // Name (2 + x bytes)
-            bis.readNBytes(shortSegmentSizeBytes, 0, 2);
-            segmentSize = (int) Binary.byteArrayToSize(shortSegmentSizeBytes, Binary.SizeType.SHORT);
-
-            name.fromByteArray(
-                    ByteArrayBuilder.build()
-                            .appendBytes(shortSegmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize))
-                            .toByteArray()
-            );
-            // Name
+            segmentSize = bsi.getShort();
+            name.fromByteArray(bsi.readNBytes(segmentSize), false);
 
             // Path (2 + x bytes)
-            bis.readNBytes(shortSegmentSizeBytes, 0, 2);
-            segmentSize = (int) Binary.byteArrayToSize(shortSegmentSizeBytes, Binary.SizeType.SHORT);
-
-            path.fromByteArray(
-                    ByteArrayBuilder.build()
-                            .appendBytes(shortSegmentSizeBytes)
-                            .appendBytes(bis.readNBytes(segmentSize))
-                            .toByteArray()
-            );
-            // Path
+            segmentSize = bsi.getShort();
+            path.fromByteArray(bsi.readNBytes(segmentSize), false);
 
             // Can read (1 byte)
-            canRead.fromByteArray(
-                    ByteArrayBuilder.build()
-                            .appendBytes(bis.readNBytes(1))
-                            .toByteArray()
-            );
-            // Can read
+            canRead.fromByteArray(bsi.readNBytes(1));
 
             // Can execute (1 byte)
-            canExecute.fromByteArray(
-                    ByteArrayBuilder.build()
-                            .appendBytes(bis.readNBytes(1))
-                            .toByteArray()
-            );
-            // Can execute
+            canExecute.fromByteArray(bsi.readNBytes(1));
 
             // Can write (1 byte)
-            canWrite.fromByteArray(
-                    ByteArrayBuilder.build()
-                            .appendBytes(bis.readNBytes(1))
-                            .toByteArray()
-            );
-            // Can write
+            canWrite.fromByteArray(bsi.readNBytes(1));
 
             // Last modified (8 bytes)
-            lastModified.fromByteArray(
-                    ByteArrayBuilder.build()
-                            .appendBytes(bis.readNBytes(8))
-                            .toByteArray()
-            );
-            // Last modified
+            lastModified.fromByteArray(bsi.readNBytes(8));
 
             // Size (8 bytes)
-            size.fromByteArray(
-                    ByteArrayBuilder.build()
-                            .appendBytes(bis.readNBytes(8))
-                            .toByteArray()
-            );
-            // Size
+            size.fromByteArray(bsi.readNBytes(8));
+
+            bsi.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void fromByteArray(byte[] bytes) {
+    public void fromByteArray(byte[] bytes, final boolean hasSizeBytes) {
+        // Ignore `hasSizeBytes` as segment size is pre-evaluated and is segregated from `bytes`
         fromByteArray(new BufferedInputStream(new ByteArrayInputStream(bytes)));
     }
 }

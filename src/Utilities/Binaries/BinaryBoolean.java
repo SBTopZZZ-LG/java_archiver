@@ -21,7 +21,8 @@ public class BinaryBoolean extends Binary {
     }
 
     @Override
-    public void fromByteArray(byte[] bytes) {
+    public void fromByteArray(byte[] bytes, final boolean hasSizeBytes) {
+        // Ignore `hasSizeBytes`, boolean is always one byte
         data = (int)bytes[0] == 1;
     }
 }

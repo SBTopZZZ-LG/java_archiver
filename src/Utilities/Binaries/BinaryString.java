@@ -28,11 +28,8 @@ public class BinaryString extends Binary {
      * @param bytes Byte array to deserialize
      * @param hasSizeBytes If byte array is a segment and includes the length
      */
-    public void fromByteArray(byte[] bytes, boolean hasSizeBytes) {
-        data = new String(hasSizeBytes ? Arrays.copyOfRange(bytes, 2, (int) (byteArrayToSize(bytes, SizeType.SHORT) + 2)) : bytes, StandardCharsets.UTF_8);
-    }
     @Override
-    public void fromByteArray(byte[] bytes) {
-        fromByteArray(bytes, true);
+    public void fromByteArray(byte[] bytes, final boolean hasSizeBytes) {
+        data = new String(hasSizeBytes ? Arrays.copyOfRange(bytes, 2, (int) (byteArrayToSize(bytes, SizeType.SHORT) + 2)) : bytes, StandardCharsets.UTF_8);
     }
 }

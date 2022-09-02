@@ -24,7 +24,8 @@ public class BinaryLong extends Binary {
     }
 
     @Override
-    public void fromByteArray(byte[] bytes) {
+    public void fromByteArray(byte[] bytes, final boolean hasSizeBytes) {
+        // Ignore `hasSizeBytes`, long is always eight bytes
         data = buffer.position(0).put(0, bytes).getLong();
     }
 }

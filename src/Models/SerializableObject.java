@@ -16,6 +16,7 @@ public abstract class SerializableObject {
     /**
      * Deserializes byte array and updates the object data
      * @param bytes Byte array to deserialize
+     * @param hasSizeBytes `true` if `bytes` includes the size bytes, otherwise `false`
      */
-    public abstract void fromByteArray(final byte[] bytes);
+    public abstract void fromByteArray(final byte[] bytes, boolean hasSizeBytes);
 }

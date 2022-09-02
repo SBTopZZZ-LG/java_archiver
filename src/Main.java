@@ -280,7 +280,7 @@ public class Main {
         final CipherKit kit2 = kit;
         while (bsi.available() > 0) {
             SerializableFile embeddedFile = new SerializableFile() {{
-                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG));
+                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG), false);
             }};
             embeddedFile.path.data = extractPath + embeddedFile.path.data;
 
@@ -392,7 +392,7 @@ public class Main {
 
         while (bsi.available() > 0) {
             SerializableFile embeddedFile = new SerializableFile() {{
-                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG));
+                fromByteArray(bsi.readSegment(BufferedStream.JavaStreamSegmentType.LONG), false);
             }};
 
             // Fix file separator (if there is a mismatch)

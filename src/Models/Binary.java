@@ -11,6 +11,14 @@ public abstract class Binary extends SerializableObject {
     private static final ByteBuffer intStaticBuffer = ByteBuffer.allocate(Integer.BYTES);
     private static final ByteBuffer longStaticBuffer = ByteBuffer.allocate(Long.BYTES);
 
+    /**
+     * Deserializes byte array and updates the object data
+     * @param bytes Byte array to deserialize (includes the size bytes)
+     */
+    public final void fromByteArray(final byte[] bytes) {
+        fromByteArray(bytes, true);
+    }
+
     public enum SizeType {
         LONG,
         INTEGER,
