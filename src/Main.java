@@ -1,3 +1,4 @@
+import Configs.Constants;
 import Configs.ErrorCodes;
 import Models.Binary;
 import Utilities.Binaries.BinaryString;
@@ -145,8 +146,8 @@ public class Main {
                         bso.putBoolean(fileSize > 0);
 
                     final BufferedStream.Input bsi = new BufferedStream.Input(new FileInputStream(file));
-                    final byte[] buffer = new byte[102400];
-                    int bufferReadLength = 102400;
+                    final byte[] buffer = new byte[Constants.DICTIONARY_MAX_SIZE];
+                    int bufferReadLength = buffer.length;
 
                     long fileSizeLeft = fileSize;
                     while (bsi.available() > 0) {
@@ -332,9 +333,9 @@ public class Main {
 
                             long length = embeddedFile.size.data;
                             while (length > 0) {
-                                fos.write(bsi.readNBytes(length < 102400 ? (int) length : 102400));
+                                fos.write(bsi.readNBytes(length < Constants.DICTIONARY_MAX_SIZE ? (int) length : Constants.DICTIONARY_MAX_SIZE));
 
-                                length -= 102400;
+                                length -= Constants.DICTIONARY_MAX_SIZE;
                                 if (length < 0)
                                     length = 0;
                             }
