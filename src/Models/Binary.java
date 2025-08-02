@@ -22,16 +22,20 @@ public abstract class Binary extends SerializableObject {
      * @return Byte array
      */
     public byte[] sizeToByteArray(SizeType sizeType) {
-        if (sizeType == SizeType.LONG)
-            longBuffer.position(0).putLong(0, getSize());
-        else if (sizeType == SizeType.INTEGER)
-            intBuffer.position(0).putInt(0, getSize());
-        else if (sizeType == SizeType.SHORT)
-            shortBuffer.position(0).putShort(0, (short) getSize());
-
-        return sizeType == SizeType.LONG ? longBuffer.array() :
-                (sizeType == SizeType.INTEGER ? intBuffer.array() :
-                        (sizeType == SizeType.SHORT ? shortBuffer.array() : null));
+        if (sizeType == SizeType.LONG) {
+            longBuffer.clear();
+            longBuffer.putLong(getSize());
+            return longBuffer.array();
+        } else if (sizeType == SizeType.INTEGER) {
+            intBuffer.clear();
+            intBuffer.putInt(getSize());
+            return intBuffer.array();
+        } else if (sizeType == SizeType.SHORT) {
+            shortBuffer.clear();
+            shortBuffer.putShort((short) getSize());
+            return shortBuffer.array();
+        }
+        return null;
     }
     /**
      * Converts and returns size from byte array
@@ -40,12 +44,22 @@ public abstract class Binary extends SerializableObject {
      * @return Size after conversion
      */
     public static long byteArrayToSize(byte[] byteArray, SizeType sizeType) {
-        if (sizeType == SizeType.LONG)
-            return longStaticBuffer.position(0).put(byteArray, 0, 8).flip().getLong();
-        else if (sizeType == SizeType.INTEGER)
-            return intStaticBuffer.position(0).put(byteArray, 0, 4).flip().getInt();
-        else if (sizeType == SizeType.SHORT)
-            return shortStaticBuffer.position(0).put(byteArray, 0, 2).flip().getShort();
+        if (sizeType == SizeType.LONG) {
+            longStaticBuffer.clear();
+            longStaticBuffer.put(byteArray, 0, Math.min(byteArray.length, Long.BYTES));
+            longStaticBuffer.flip();
+            return longStaticBuffer.getLong();
+        } else if (sizeType == SizeType.INTEGER) {
+            intStaticBuffer.clear();
+            intStaticBuffer.put(byteArray, 0, Math.min(byteArray.length, Integer.BYTES));
+            intStaticBuffer.flip();
+            return intStaticBuffer.getInt();
+        } else if (sizeType == SizeType.SHORT) {
+            shortStaticBuffer.clear();
+            shortStaticBuffer.put(byteArray, 0, Math.min(byteArray.length, Short.BYTES));
+            shortStaticBuffer.flip();
+            return shortStaticBuffer.getShort();
+        }
 
         return 0;
     }
@@ -56,7 +70,9 @@ public abstract class Binary extends SerializableObject {
      * @return Byte array
      */
     public static byte[] sizeToByteArray(long size) {
-        return longStaticBuffer.position(0).putLong(size).array();
+        longStaticBuffer.clear();
+        longStaticBuffer.putLong(size);
+        return longStaticBuffer.array();
     }
 
     /**
@@ -65,7 +81,10 @@ public abstract class Binary extends SerializableObject {
      * @return Size after conversion
      */
     public static long byteArrayToSize(byte[] byteArray) {
-        return longStaticBuffer.position(0).put(byteArray, 0, 8).flip().getLong();
+        longStaticBuffer.clear();
+        longStaticBuffer.put(byteArray, 0, Math.min(byteArray.length, Long.BYTES));
+        longStaticBuffer.flip();
+        return longStaticBuffer.getLong();
     }
 
     /**

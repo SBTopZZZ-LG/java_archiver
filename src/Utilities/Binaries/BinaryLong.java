@@ -20,11 +20,15 @@ public class BinaryLong extends Binary {
 
     @Override
     public byte[] toByteArray() {
-        return buffer.putLong(0, data).array();
+        buffer.clear();
+        return buffer.putLong(data).array();
     }
 
     @Override
     public void fromByteArray(byte[] bytes) {
-        data = buffer.position(0).put(0, bytes).getLong();
+        buffer.clear();
+        buffer.put(bytes, 0, Math.min(bytes.length, Long.BYTES));
+        buffer.flip();
+        data = buffer.getLong();
     }
 }

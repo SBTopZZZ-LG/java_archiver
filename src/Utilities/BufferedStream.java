@@ -158,7 +158,10 @@ public class BufferedStream {
         @Override
         public short getShort() {
             try {
-                return shortBuffer.position(0).put(readNBytes(2)).flip().getShort();
+                shortBuffer.clear();
+                shortBuffer.put(readNBytes(2));
+                shortBuffer.flip();
+                return shortBuffer.getShort();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -167,7 +170,10 @@ public class BufferedStream {
         @Override
         public int getInt() {
             try {
-                return intBuffer.position(0).put(readNBytes(4)).flip().getInt();
+                intBuffer.clear();
+                intBuffer.put(readNBytes(4));
+                intBuffer.flip();
+                return intBuffer.getInt();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -176,7 +182,10 @@ public class BufferedStream {
         @Override
         public long getLong() {
             try {
-                return longBuffer.position(0).put(readNBytes(8)).flip().getLong();
+                longBuffer.clear();
+                longBuffer.put(readNBytes(8));
+                longBuffer.flip();
+                return longBuffer.getLong();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -247,7 +256,9 @@ public class BufferedStream {
         @Override
         public void putShort(short value) {
             try {
-                write(shortBuffer.position(0).putShort(value).array());
+                shortBuffer.clear();
+                shortBuffer.putShort(value);
+                write(shortBuffer.array());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -256,7 +267,9 @@ public class BufferedStream {
         @Override
         public void putInt(int value) {
             try {
-                write(intBuffer.position(0).putInt(value).array());
+                intBuffer.clear();
+                intBuffer.putInt(value);
+                write(intBuffer.array());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -265,7 +278,9 @@ public class BufferedStream {
         @Override
         public void putLong(long value) {
             try {
-                write(longBuffer.position(0).putLong(value).array());
+                longBuffer.clear();
+                longBuffer.putLong(value);
+                write(longBuffer.array());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
