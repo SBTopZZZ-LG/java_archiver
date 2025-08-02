@@ -26,6 +26,19 @@ public class CipherKit {
         this.nonce = nonce;
         this.password = password.toCharArray();
     }
+    
+    /**
+     * Clears sensitive data from memory
+     */
+    public void clearSensitiveData() {
+        if (password != null) {
+            java.util.Arrays.fill(password, '\0');
+        }
+        if (nonce != null) {
+            java.util.Arrays.fill(nonce, (byte) 0);
+        }
+        // Note: SecretKey cannot be easily cleared, but it will be garbage collected
+    }
 
     /**
      * Generates a new SecretKey object from the specified parameters
@@ -34,11 +47,17 @@ public class CipherKit {
      * @return SecretKey instance
      */
     public static SecretKey generateSecretKey(String password, byte[] nonce) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), nonce, 65536, 128); // AES-128
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        byte[] key = secretKeyFactory.generateSecret(spec).getEncoded();
+        char[] passwordChars = password.toCharArray();
+        try {
+            KeySpec spec = new PBEKeySpec(passwordChars, nonce, 65536, 128); // AES-128
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            byte[] key = secretKeyFactory.generateSecret(spec).getEncoded();
 
-        return new SecretKeySpec(key, "AES");
+            return new SecretKeySpec(key, "AES");
+        } finally {
+            // Clear password from memory
+            java.util.Arrays.fill(passwordChars, '\0');
+        }
     }
 
     public enum CipherMode {

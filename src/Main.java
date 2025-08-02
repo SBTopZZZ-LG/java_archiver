@@ -6,7 +6,7 @@ import Utilities.BufferedStream;
 import Utilities.CipherKit;
 import Utilities.IO;
 import Utilities.SerializableFile;
-import com.bethecoder.ascii_table.ASCIITable;
+import Utilities.SimpleASCIITable;
 
 import javax.crypto.AEADBadTagException;
 import java.io.*;
@@ -428,7 +428,7 @@ public class Main {
         for (final String[] dataSetRow : dataSet)
             dataSet2[index++] = dataSetRow;
 
-        ASCIITable inst = ASCIITable.getInstance();
+        SimpleASCIITable inst = SimpleASCIITable.getInstance();
         inst.printTable(new String[] {
                 "Name", "Path", "Readable", "Executable", "Writable", "Last modified", "Size"
         }, dataSet2);
