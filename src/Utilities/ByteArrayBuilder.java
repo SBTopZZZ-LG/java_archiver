@@ -62,4 +62,31 @@ public class ByteArrayBuilder {
     public static ByteArrayBuilder build() {
         return new ByteArrayBuilder();
     }
+    
+    /**
+     * Converts an integer to 4 bytes in big-endian format
+     * @param value Integer value
+     * @return Byte array
+     */
+    public static byte[] intToBytes(int value) {
+        return new byte[] {
+            (byte) (value >>> 24),
+            (byte) (value >>> 16),
+            (byte) (value >>> 8),
+            (byte) value
+        };
+    }
+    
+    /**
+     * Converts 4 bytes in big-endian format to an integer
+     * @param bytes Byte array
+     * @param offset Offset in the array
+     * @return Integer value
+     */
+    public static int bytesToInt(byte[] bytes, int offset) {
+        return ((bytes[offset] & 0xff) << 24) |
+               ((bytes[offset + 1] & 0xff) << 16) |
+               ((bytes[offset + 2] & 0xff) << 8) |
+               (bytes[offset + 3] & 0xff);
+    }
 }
