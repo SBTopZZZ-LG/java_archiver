@@ -1,2 +1,40 @@
 # Build files
 /out/
+
+# Build artifacts
+target/
+*.archivit
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Maven
+.m2/repository/
+.mvn/
+
+# Test artifacts
+*_test/
+*_test
+test_output/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*~
