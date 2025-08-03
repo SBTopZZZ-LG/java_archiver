@@ -1,0 +1,300 @@
+name: Java Archiver CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'feature/*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  MAVEN_OPTS: -Dmaven.repo.local=.m2/repository
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [17, 21]
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Verify project compiles
+        run: mvn clean compile -B
+
+      - name: Run tests
+        run: mvn test -B
+        
+      - name: Generate code coverage report
+        run: mvn jacoco:report -B
+
+      - name: Check code coverage threshold
+        run: mvn jacoco:check -B
+        continue-on-error: true
+
+      - name: Upload coverage reports to Codecov
+        if: matrix.java-version == '17'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-java-${{ matrix.java-version }}
+          path: |
+            target/surefire-reports/
+            target/site/jacoco/
+
+  lint:
+    name: Code Quality & Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:check -B
+        continue-on-error: true
+
+      - name: Run SpotBugs
+        run: mvn spotbugs:check -B
+        continue-on-error: true
+
+      - name: Archive lint results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: lint-results
+          path: |
+            target/checkstyle-result.xml
+            target/spotbugsXml.xml
+
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: .m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build application
+        run: mvn clean package -DskipTests -B
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: application-jar
+          path: target/*.jar
+
+  report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: [test, lint, build]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download test artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: test-results-java-17
+          path: test-results/
+
+      - name: Download lint artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: lint-results
+          path: lint-results/
+        continue-on-error: true
+
+      - name: Parse test results
+        id: test-results
+        run: |
+          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "test-results/TEST-*.xml" ]; then
+            TOTAL_TESTS=$(grep -h "tests=" test-results/TEST-*.xml | sed 's/.*tests="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+            FAILED_TESTS=$(grep -h "failures=" test-results/TEST-*.xml | sed 's/.*failures="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+            ERROR_TESTS=$(grep -h "errors=" test-results/TEST-*.xml | sed 's/.*errors="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+            SKIPPED_TESTS=$(grep -h "skipped=" test-results/TEST-*.xml | sed 's/.*skipped="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+            
+            PASSED_TESTS=$((TOTAL_TESTS - FAILED_TESTS - ERROR_TESTS - SKIPPED_TESTS))
+            
+            echo "- **Total Tests:** $TOTAL_TESTS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Passed:** ✅ $PASSED_TESTS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Failed:** ❌ $FAILED_TESTS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Errors:** ⚠️ $ERROR_TESTS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Skipped:** ⏭️ $SKIPPED_TESTS" >> $GITHUB_STEP_SUMMARY
+            
+            if [ $FAILED_TESTS -eq 0 ] && [ $ERROR_TESTS -eq 0 ]; then
+              echo "- **Status:** 🎉 All tests passed!" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **Status:** 💥 Some tests failed" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            echo "test_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "- **Status:** ❌ No test results found" >> $GITHUB_STEP_SUMMARY
+            echo "test_status=failure" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Parse coverage results
+        id: coverage-results
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Code Coverage" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "test-results/jacoco.csv" ]; then
+            # Parse JaCoCo CSV report
+            INSTRUCTION_MISSED=$(tail -n 1 test-results/jacoco.csv | cut -d, -f4)
+            INSTRUCTION_COVERED=$(tail -n 1 test-results/jacoco.csv | cut -d, -f5)
+            BRANCH_MISSED=$(tail -n 1 test-results/jacoco.csv | cut -d, -f6)
+            BRANCH_COVERED=$(tail -n 1 test-results/jacoco.csv | cut -d, -f7)
+            
+            TOTAL_INSTRUCTIONS=$((INSTRUCTION_MISSED + INSTRUCTION_COVERED))
+            TOTAL_BRANCHES=$((BRANCH_MISSED + BRANCH_COVERED))
+            
+            if [ $TOTAL_INSTRUCTIONS -gt 0 ]; then
+              INSTRUCTION_COVERAGE=$((INSTRUCTION_COVERED * 100 / TOTAL_INSTRUCTIONS))
+            else
+              INSTRUCTION_COVERAGE=0
+            fi
+            
+            if [ $TOTAL_BRANCHES -gt 0 ]; then
+              BRANCH_COVERAGE=$((BRANCH_COVERED * 100 / TOTAL_BRANCHES))
+            else
+              BRANCH_COVERAGE=0
+            fi
+            
+            echo "- **Instruction Coverage:** $INSTRUCTION_COVERAGE% ($INSTRUCTION_COVERED/$TOTAL_INSTRUCTIONS)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Branch Coverage:** $BRANCH_COVERAGE% ($BRANCH_COVERED/$TOTAL_BRANCHES)" >> $GITHUB_STEP_SUMMARY
+            
+            if [ $INSTRUCTION_COVERAGE -ge 92 ]; then
+              echo "- **Coverage Status:** 🎯 Target coverage achieved!" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **Coverage Status:** 📈 Need to improve coverage (target: 92%)" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "- **Status:** ❌ No coverage report found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Parse lint results
+        id: lint-results
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Code Quality" >> $GITHUB_STEP_SUMMARY
+          
+          # Checkstyle results
+          if [ -f "lint-results/checkstyle-result.xml" ]; then
+            CHECKSTYLE_ERRORS=$(grep -c "<error " lint-results/checkstyle-result.xml || echo "0")
+            echo "- **Checkstyle Issues:** $CHECKSTYLE_ERRORS" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Checkstyle:** ❌ No results found" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # SpotBugs results
+          if [ -f "lint-results/spotbugsXml.xml" ]; then
+            SPOTBUGS_BUGS=$(grep -c "<BugInstance " lint-results/spotbugsXml.xml || echo "0")
+            echo "- **SpotBugs Issues:** $SPOTBUGS_BUGS" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **SpotBugs:** ❌ No results found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Build status summary
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Build Summary" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.test.result }}" == "success" ]; then
+            echo "- **Tests:** ✅ Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Tests:** ❌ Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.lint.result }}" == "success" ]; then
+            echo "- **Linting:** ✅ Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Linting:** ⚠️ Issues found" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.build.result }}" == "success" ]; then
+            echo "- **Build:** ✅ Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Build:** ❌ Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- Review any failing tests and fix issues" >> $GITHUB_STEP_SUMMARY
+          echo "- Address code quality issues identified by linting tools" >> $GITHUB_STEP_SUMMARY
+          echo "- Improve test coverage to reach 92% target" >> $GITHUB_STEP_SUMMARY
+          echo "- Verify all functionality works as expected" >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync(process.env.GITHUB_STEP_SUMMARY, 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## CI/CD Pipeline Results\n\n' + summary
+            });

@@ -297,19 +297,24 @@ class BufferedStreamTest {
     @Test
     @DisplayName("BufferedStream should handle IOException properly")
     void testBufferedStreamIOException() throws IOException {
-        // Create a file and then make it unreadable
+        // Create a file and then create input stream
         try (FileOutputStream fos = new FileOutputStream(testFile)) {
             fos.write(testData);
         }
         
-        // Create input stream and then delete the file to simulate IO error
+        // Create input stream from existing file
         BufferedStream.Input input = new BufferedStream.Input(new FileInputStream(testFile));
-        testFile.delete();
         
+        // Read some data normally first
+        byte[] normalRead = input.readNBytes(5);
+        assertThat(normalRead).hasSize(5);
+        
+        // Close the underlying stream to force an error
+        input.close();
+        
+        // Now trying to read should fail
         assertThatThrownBy(() -> input.readNBytes(100))
             .isInstanceOf(IOException.class);
-        
-        input.close();
     }
 
     @Test

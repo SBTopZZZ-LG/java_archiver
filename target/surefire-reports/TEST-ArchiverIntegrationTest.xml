@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="ArchiverIntegrationTest" time="0.285" tests="6" errors="3" skipped="0" failures="3">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="ArchiverIntegrationTest" time="0.286" tests="6" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -11,7 +11,7 @@
     <property name="java.vm.specification.version" value="17"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/temurin-17-jdk-amd64/lib"/>
-    <property name="sun.java.command" value="/home/runner/work/java_archiver/java_archiver/target/surefire/surefirebooter-20250803082532008_3.jar /home/runner/work/java_archiver/java_archiver/target/surefire 2025-08-03T08-25-28_235-jvmRun1 surefire-20250803082532008_1tmp surefire_0-20250803082532008_2tmp"/>
+    <property name="sun.java.command" value="/home/runner/work/java_archiver/java_archiver/target/surefire/surefirebooter-20250803084101911_3.jar /home/runner/work/java_archiver/java_archiver/target/surefire 2025-08-03T08-41-01_849-jvmRun1 surefire-20250803084101911_1tmp surefire_0-20250803084101911_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/runner/work/java_archiver/java_archiver/target/test-classes:/home/runner/work/java_archiver/java_archiver/target/classes:/home/runner/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/runner/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/runner/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/runner/.m2/repository/org/mockito/mockito-core/5.5.0/mockito-core-5.5.0.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy/1.14.6/byte-buddy-1.14.6.jar:/home/runner/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.6/byte-buddy-agent-1.14.6.jar:/home/runner/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/runner/.m2/repository/org/mockito/mockito-junit-jupiter/5.5.0/mockito-junit-jupiter-5.5.0.jar:/home/runner/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -26,7 +26,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="surefire.real.class.path" value="/home/runner/work/java_archiver/java_archiver/target/surefire/surefirebooter-20250803082532008_3.jar"/>
+    <property name="surefire.real.class.path" value="/home/runner/work/java_archiver/java_archiver/target/surefire/surefirebooter-20250803084101911_3.jar"/>
     <property name="java.util.logging.config.file" value="src/test/resources/logging.properties"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.16+8"/>
@@ -53,83 +53,10 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testErrorRecoveryWorkflow" classname="ArchiverIntegrationTest" time="0.056">
-    <error message="len &lt; 0" type="java.lang.IllegalArgumentException"><![CDATA[java.lang.IllegalArgumentException: len < 0
-	at java.base/java.io.InputStream.readNBytes(InputStream.java:396)
-	at Utilities.SerializableFile.fromByteArray(SerializableFile.java:146)
-	at Utilities.SerializableFile.fromByteArray(SerializableFile.java:171)
-	at Utilities.ArchiverAPI$8.<init>(ArchiverAPI.java:588)
-	at Utilities.ArchiverAPI.listArchiveContents(ArchiverAPI.java:587)
-	at ArchiverIntegrationTest.testErrorRecoveryWorkflow(ArchiverIntegrationTest.java:281)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-]]></error>
-  </testcase>
-  <testcase name="testCrossPlatformCompatibility" classname="ArchiverIntegrationTest" time="0.03">
-    <error message="len &lt; 0" type="java.lang.IllegalArgumentException"><![CDATA[java.lang.IllegalArgumentException: len < 0
-	at java.base/java.io.InputStream.readNBytes(InputStream.java:396)
-	at Utilities.SerializableFile.fromByteArray(SerializableFile.java:146)
-	at Utilities.SerializableFile.fromByteArray(SerializableFile.java:171)
-	at Utilities.ArchiverAPI$8.<init>(ArchiverAPI.java:588)
-	at Utilities.ArchiverAPI.listArchiveContents(ArchiverAPI.java:587)
-	at ArchiverIntegrationTest.testCrossPlatformCompatibility(ArchiverIntegrationTest.java:301)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-]]></error>
-  </testcase>
-  <testcase name="testMultipleArchivesWorkflow" classname="ArchiverIntegrationTest" time="0.036">
-    <failure message="&#10;Expecting path:&#10;  /tmp/junit9519079148121102500/extract2/source2&#10;to exist (symbolic links were followed)." type="java.lang.AssertionError"><![CDATA[java.lang.AssertionError: 
-
-Expecting path:
-  /tmp/junit9519079148121102500/extract2/source2
-to exist (symbolic links were followed).
-	at ArchiverIntegrationTest.testMultipleArchivesWorkflow(ArchiverIntegrationTest.java:257)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-]]></failure>
-  </testcase>
-  <testcase name="testLargeFileWorkflow" classname="ArchiverIntegrationTest" time="0.115">
-    <failure message="&#10;Expecting value to be true but was false" type="org.opentest4j.AssertionFailedError"><![CDATA[org.opentest4j.AssertionFailedError: 
-
-Expecting value to be true but was false
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
-	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
-	at ArchiverIntegrationTest.testLargeFileWorkflow(ArchiverIntegrationTest.java:204)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-]]></failure>
-  </testcase>
-  <testcase name="testCompleteWorkflowWithComplexStructure" classname="ArchiverIntegrationTest" time="0.036">
-    <error message="len &lt; 0" type="java.lang.IllegalArgumentException"><![CDATA[java.lang.IllegalArgumentException: len < 0
-	at java.base/java.io.InputStream.readNBytes(InputStream.java:396)
-	at Utilities.SerializableFile.fromByteArray(SerializableFile.java:146)
-	at Utilities.SerializableFile.fromByteArray(SerializableFile.java:171)
-	at Utilities.ArchiverAPI$8.<init>(ArchiverAPI.java:588)
-	at Utilities.ArchiverAPI.listArchiveContents(ArchiverAPI.java:587)
-	at ArchiverIntegrationTest.testCompleteWorkflowWithComplexStructure(ArchiverIntegrationTest.java:113)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-]]></error>
-  </testcase>
-  <testcase name="testPasswordProtectedWorkflow" classname="ArchiverIntegrationTest" time="0.005">
-    <failure message="&#10;Expecting value to be true but was false" type="org.opentest4j.AssertionFailedError"><![CDATA[org.opentest4j.AssertionFailedError: 
-
-Expecting value to be true but was false
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
-	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
-	at ArchiverIntegrationTest.testPasswordProtectedWorkflow(ArchiverIntegrationTest.java:156)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-]]></failure>
-  </testcase>
+  <testcase name="testErrorRecoveryWorkflow" classname="ArchiverIntegrationTest" time="0.078"/>
+  <testcase name="testCrossPlatformCompatibility" classname="ArchiverIntegrationTest" time="0.036"/>
+  <testcase name="testMultipleArchivesWorkflow" classname="ArchiverIntegrationTest" time="0.019"/>
+  <testcase name="testLargeFileWorkflow" classname="ArchiverIntegrationTest" time="0.05"/>
+  <testcase name="testCompleteWorkflowWithComplexStructure" classname="ArchiverIntegrationTest" time="0.031"/>
+  <testcase name="testPasswordProtectedWorkflow" classname="ArchiverIntegrationTest" time="0.064"/>
 </testsuite>
