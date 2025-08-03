@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Suppress JavadocPackage for main source (legacy code) -->
+    <suppress checks="JavadocPackage" files="src/.*\.java"/>
+    
+    <!-- Suppress some checks for legacy Main classes -->
+    <suppress checks="MagicNumber" files="Main\.java"/>
+    <suppress checks="MagicNumber" files="MainEnhanced\.java"/>
+    
+    <!-- Suppress some checks for test files -->
+    <suppress checks="MagicNumber" files=".*Test\.java"/>
+    <suppress checks="JavadocMethod" files=".*Test\.java"/>
+    <suppress checks="JavadocType" files=".*Test\.java"/>
+    <suppress checks="JavadocVariable" files=".*Test\.java"/>
+    <suppress checks="MissingJavadocMethod" files=".*Test\.java"/>
+    <suppress checks="DesignForExtension" files=".*Test\.java"/>
+    <suppress checks="HideUtilityClassConstructor" files=".*Test\.java"/>
+    
+    <!-- Suppress line length for some files with long constants -->
+    <suppress checks="LineLength" files="Constants\.java"/>
+</suppressions>
